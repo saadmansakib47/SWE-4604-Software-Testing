@@ -1,0 +1,311 @@
+{
+	"info": {
+		"_postman_id": "08bdbfcd-1f1e-456c-8eab-1ea33abe5fc3",
+		"name": "SimpleBookAPITest",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "35615032"
+	},
+	"item": [
+		{
+			"name": "StatusTest",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 200\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"console.log(\"PASSED\")"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"packages": {},
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://simple-books-api.glitch.me/status",
+					"protocol": "https",
+					"host": [
+						"simple-books-api",
+						"glitch",
+						"me"
+					],
+					"path": [
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve All Non Fiction Books",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"All books are non-fiction\", function () {\r",
+							"    const books = pm.response.json();\r",
+							"    books.forEach(book => {\r",
+							"        pm.expect(book.type).to.eql(\"non-fiction\");\r",
+							"    });\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://simple-books-api.glitch.me/books?type=non-fiction",
+					"protocol": "https",
+					"host": [
+						"simple-books-api",
+						"glitch",
+						"me"
+					],
+					"path": [
+						"books"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "non-fiction"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verify Book List Limit",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const books = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Exactly 3 books are returned\", function () {\r",
+							"    pm.expect(books.length).to.eql(3);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Save first bookId to collection variable\", function () {\r",
+							"    pm.collectionVariables.set(\"bookId\", books[0].id);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://simple-books-api.glitch.me/books?limit=3",
+					"protocol": "https",
+					"host": [
+						"simple-books-api",
+						"glitch",
+						"me"
+					],
+					"path": [
+						"books"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Details of a Specific Book",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const book = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Book has correct properties\", function () {\r",
+							"    pm.expect(book).to.have.property(\"id\");\r",
+							"    pm.expect(book).to.have.property(\"name\");\r",
+							"    pm.expect(book).to.have.property(\"author\");\r",
+							"    pm.expect(book).to.have.property(\"available\");\r",
+							"    pm.expect(book).to.have.property(\"type\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Returned book ID matches requested\", function () {\r",
+							"    pm.expect(book.id).to.eql(pm.collectionVariables.get(\"bookId\"));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://simple-books-api.glitch.me/books/{{bookId}}",
+					"protocol": "https",
+					"host": [
+						"simple-books-api",
+						"glitch",
+						"me"
+					],
+					"path": [
+						"books",
+						"{{bookId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register API Clients & Save Tokens",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const res = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Token received\", function () {\r",
+							"    pm.expect(res).to.have.property(\"accessToken\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Save token to global variable\", function () \r",
+							"{\r",
+							"    pm.globals.set(\"accessToken\", res.accessToken);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"clientName\": \"Saadman Sakib\",\r\n    \"clientEmail\": \"saadmansakibt@test.com\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://simple-books-api.glitch.me/api-clients/",
+					"protocol": "https",
+					"host": [
+						"simple-books-api",
+						"glitch",
+						"me"
+					],
+					"path": [
+						"api-clients",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a New Order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const order = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Order created and ID returned\", function () \r",
+							"{\r",
+							"    pm.expect(order).to.have.property(\"orderId\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Save orderId to global variable\", function () \r",
+							"{\r",
+							"    pm.globals.set(\"orderId\", order.orderId);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"bookId\": \"{{bookId}}\",\r\n    \"customerName\": \"Saadman Sakib\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://simple-books-api.glitch.me/orders/",
+					"protocol": "https",
+					"host": [
+						"simple-books-api",
+						"glitch",
+						"me"
+					],
+					"path": [
+						"orders",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "bookId",
+			"value": ""
+		}
+	]
+}
